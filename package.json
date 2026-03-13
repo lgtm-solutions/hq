@@ -1,0 +1,16 @@
+{
+  "name": "hq",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter @hq/web dev",
+    "build": "pnpm --filter @hq/web build",
+    "db:generate": "pnpm --filter @hq/db generate",
+    "db:migrate": "pnpm --filter @hq/db migrate",
+    "db:studio": "pnpm --filter @hq/db studio"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}
