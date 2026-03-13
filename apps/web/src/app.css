@@ -1,1 +1,70 @@
 @import 'tailwindcss';
+
+@theme {
+  --color-surface-0: #09090b;
+  --color-surface-1: #0f0f12;
+  --color-surface-2: #18181b;
+  --color-surface-3: #1e1e22;
+  --color-border-subtle: #27272a;
+  --color-border-default: #3f3f46;
+  --color-text-primary: #fafafa;
+  --color-text-secondary: #a1a1aa;
+  --color-text-muted: #71717a;
+  --color-accent: #6366f1;
+  --color-accent-hover: #818cf8;
+  --color-accent-muted: rgba(99, 102, 241, 0.12);
+  --color-danger: #f87171;
+  --color-success: #34d399;
+}
+
+/* Sidebar transitions */
+.nav-link {
+  transition: all 0.15s ease;
+}
+
+.nav-link:hover {
+  background: var(--color-surface-3);
+}
+
+.nav-link.active {
+  background: var(--color-accent-muted);
+  color: var(--color-accent-hover);
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  border-color: var(--color-border-default);
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.08);
+}
+
+/* Subtle pulse for status indicators */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-subtle);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-default);
+}
