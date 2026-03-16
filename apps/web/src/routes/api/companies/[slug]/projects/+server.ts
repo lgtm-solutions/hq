@@ -1,12 +1,12 @@
 import { json } from '@sveltejs/kit';
 import { getConfigDir, reloadConfig } from '$lib/server/config';
-import { createAgent } from '@hq/config';
+import { createProject } from '@hq/config';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
   const company = locals.config.companies.find((c) => c.slug === params.slug);
   if (!company) return json({ error: 'company not found' }, { status: 404 });
-  return json(company.agents);
+  return json(company.projects);
 };
 
 export const POST: RequestHandler = async ({ params, request, locals }) => {
@@ -14,30 +14,27 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
   if (!company) return json({ error: 'company not found' }, { status: 404 });
 
   const body = await request.json();
-  const { name, role, provider, model } = body;
+  const { name, slug } = body;
 
-  if (!name || !role || !provider || !model) {
-    return json({ error: 'name, role, provider, and model are required' }, { status: 400 });
+  if (!name || !slug) {
+    return json({ error: 'name and slug are required' }, { status: 400 });
   }
-  if (company.agents.some((a) => a.name === name)) {
-    return json({ error: `Agent "${name}" already exists` }, { status: 409 });
+  if (company.projects.some((p) => p.slug === slug)) {
+    return json({ error: `Project "${slug}" already exists` }, { status: 409 });
   }
 
-  await createAgent(getConfigDir(), params.slug, {
+  await createProject(getConfigDir(), params.slug, {
     name,
-    role,
+    slug,
     description: body.description,
-    provider,
-    model,
-    reportsTo: body.reportsTo ?? null,
-    manages: body.manages || [],
-    budget: body.budget,
+    git: body.git,
+    agents: body.agents,
     channels: body.channels,
-    systemPrompt: body.systemPrompt,
+    metadata: body.metadata,
   });
 
   const config = await reloadConfig();
-  const agent = config.companies.find((c) => c.slug === params.slug)?.agents.find((a) => a.name === name);
+  const project = config.companies.find((c) => c.slug === params.slug)?.projects.find((p) => p.slug === slug);
 
-  return json(agent, { status: 201 });
+  return json(project, { status: 201 });
 };

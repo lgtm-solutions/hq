@@ -8,6 +8,7 @@ import { registerSubtaskTools } from './tools/subtasks.js';
 import { registerCommentTools } from './tools/comments.js';
 import { registerCompanyTools } from './tools/companies.js';
 import { registerAgentTools } from './tools/agents.js';
+import { registerProjectTools } from './tools/projects.js';
 
 const PORT = parseInt(process.env.MCP_PORT || '3001', 10);
 
@@ -28,6 +29,7 @@ async function main() {
   registerCommentTools(server);
   registerCompanyTools(server);
   registerAgentTools(server);
+  registerProjectTools(server);
 
   // Session management
   const sessions = new Map<string, StreamableHTTPServerTransport>();
@@ -118,7 +120,7 @@ async function main() {
 
   httpServer.listen(PORT, () => {
     console.log(`[hq-mcp] Streamable HTTP MCP server running on http://localhost:${PORT}/mcp`);
-    console.log(`[hq-mcp] 16 tools registered (hq_*)`);
+    console.log(`[hq-mcp] 28 tools registered (hq_*)`);
   });
 }
 

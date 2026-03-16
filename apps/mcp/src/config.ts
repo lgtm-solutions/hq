@@ -6,10 +6,18 @@ const PROJECT_ROOT = resolve(import.meta.dirname, '..', '..', '..');
 
 let _config: HQConfig;
 
+export function getConfigDir(): string {
+  return process.env.HQ_CONFIG_DIR || resolve(PROJECT_ROOT, 'examples');
+}
+
 export async function getConfig(): Promise<HQConfig> {
   if (!_config) {
-    const configDir = process.env.HQ_CONFIG_DIR || resolve(PROJECT_ROOT, 'examples');
-    _config = await loadConfig(configDir);
+    _config = await loadConfig(getConfigDir());
   }
+  return _config;
+}
+
+export async function reloadConfig(): Promise<HQConfig> {
+  _config = await loadConfig(getConfigDir());
   return _config;
 }
