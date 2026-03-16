@@ -23,6 +23,6 @@
   // System prompt — plain strings + $include globs get concatenated
   systemPrompt: [
     "You are a full-stack developer. Write clean, tested code. Follow the project's conventions and ask the CTO for guidance on architecture decisions.",
-    { $include: "agents/fullstack-dev/*.md" },
+    { $include: "./*.md" },
   ],
 }

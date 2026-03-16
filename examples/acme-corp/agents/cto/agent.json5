@@ -23,6 +23,6 @@
   // System prompt — plain strings + $include globs get concatenated
   systemPrompt: [
     "You are the CTO of Acme Corp. Make technical architecture decisions, review code, and coordinate the engineering team.",
-    { $include: "acme-corp/agents/cto/*.md" },
+    { $include: "./*.md" },
   ],
 }
