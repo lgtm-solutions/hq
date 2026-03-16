@@ -2,7 +2,9 @@
   "name": "hq",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter @hq/web dev",
+    "dev": "pnpm --filter @hq/web --filter @hq/mcp dev",
+    "dev:web": "pnpm --filter @hq/web dev",
+    "dev:mcp": "pnpm --filter @hq/mcp dev",
     "build": "pnpm --filter @hq/web build",
     "test": "pnpm test:unit",
     "test:unit": "vitest run",

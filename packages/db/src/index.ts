@@ -8,7 +8,7 @@ const MIGRATIONS_DIR = resolve(import.meta.dirname, '..', 'drizzle');
 
 export async function createDb(url: string) {
   // Run migrations on startup
-  const migrationClient = postgres(url, { max: 1 });
+  const migrationClient = postgres(url, { max: 1, onnotice: () => {} });
   await migrate(drizzle(migrationClient), { migrationsFolder: MIGRATIONS_DIR });
   await migrationClient.end();
 
