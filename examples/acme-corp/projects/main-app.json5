@@ -1,0 +1,18 @@
+{
+  name: "Main App",
+  slug: "main-app",
+  description: "Core SaaS product — the primary revenue-generating application",
+  git: "https://github.com/acme/main-app",
+
+  // Agents assigned to this project
+  agents: ["cto", "fullstack-dev"],
+
+  // Channels linked to this project
+  channels: ["slack:main-app-dev"],
+
+  // Arbitrary metadata for agent context
+  metadata: {
+    stack: "SvelteKit, PostgreSQL, Tailwind CSS",
+    deployTarget: "Vercel",
+  },
+}

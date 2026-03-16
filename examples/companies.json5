@@ -1,0 +1,11 @@
+{
+  // List of companies managed by this HQ instance.
+  // Each entry uses $include to load the full company definition
+  // from its own directory.
+  companies: [
+    { $include: "acme-corp/company.json5" },
+
+    // Add more companies here:
+    // { $include: "another-company/company.json5" },
+  ],
+}

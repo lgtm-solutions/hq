@@ -1,0 +1,25 @@
+{
+  name: "cto",
+  role: "CTO",
+  description: "Chief Technology Officer — owns technical architecture and engineering team",
+
+  // LLM configuration
+  provider: "anthropic",
+  model: "claude-sonnet-4-6",
+
+  // Org hierarchy
+  reportsTo: "ceo",
+  manages: ["fullstack-dev"],
+
+  // Budget
+  budget: {
+    monthly: 200.00,     // USD — higher budget for code-heavy tasks
+    currency: "USD",
+  },
+
+  // Channels this agent monitors
+  channels: ["slack:engineering", "slack:leadership"],
+
+  // System prompt additions
+  systemPrompt: "You are the CTO of Acme Corp. Make technical architecture decisions, review code, and coordinate the engineering team.",
+}

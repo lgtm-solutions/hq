@@ -1,0 +1,4 @@
+{
+  name: "B",
+  ref: { $include: "circular/a.json5" },
+}

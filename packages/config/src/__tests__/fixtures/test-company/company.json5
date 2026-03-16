@@ -1,0 +1,12 @@
+{
+  name: "Test Company",
+  slug: "test-company",
+  description: "A test company",
+  mission: "Testing",
+  agents: [
+    { $include: "test-company/agents/bot.json5" },
+  ],
+  projects: [
+    { $include: "test-company/projects/app.json5" },
+  ],
+}

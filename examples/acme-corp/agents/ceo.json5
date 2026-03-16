@@ -1,0 +1,25 @@
+{
+  name: "ceo",
+  role: "CEO",
+  description: "Chief Executive Officer — sets company direction and priorities",
+
+  // LLM configuration
+  provider: "anthropic",
+  model: "claude-sonnet-4-6",
+
+  // Org hierarchy
+  reportsTo: null,       // top of the chain
+  manages: ["cto"],
+
+  // Budget
+  budget: {
+    monthly: 100.00,     // USD
+    currency: "USD",
+  },
+
+  // Channels this agent monitors
+  channels: ["slack:general", "slack:leadership"],
+
+  // System prompt additions
+  systemPrompt: "You are the CEO of Acme Corp. Focus on strategic decisions, company direction, and high-level prioritization.",
+}

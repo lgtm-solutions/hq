@@ -4,9 +4,15 @@
   "scripts": {
     "dev": "pnpm --filter @hq/web dev",
     "build": "pnpm --filter @hq/web build",
+    "test": "pnpm test:unit",
+    "test:unit": "vitest run",
+    "test:e2e": "pnpm --filter @hq/web test:e2e",
     "db:generate": "pnpm --filter @hq/db generate",
     "db:migrate": "pnpm --filter @hq/db migrate",
     "db:studio": "pnpm --filter @hq/db studio"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

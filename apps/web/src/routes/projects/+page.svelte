@@ -35,7 +35,7 @@
   {:else}
     <div class="grid gap-3">
       {#each data.projects as project}
-        <a href="/projects/{project.id}" class="card-hover group block rounded-xl border border-border-subtle bg-surface-1 p-5">
+        <a href="/companies/{project.companySlug}" class="card-hover group block rounded-xl border border-border-subtle bg-surface-1 p-5">
           <div class="flex items-start justify-between">
             <div class="flex items-center gap-3">
               <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-surface-3 text-sm font-semibold text-text-secondary group-hover:bg-accent-muted group-hover:text-accent-hover transition-colors">
@@ -43,6 +43,7 @@
               </div>
               <div>
                 <div class="font-medium group-hover:text-accent-hover transition-colors">{project.name}</div>
+                <div class="mt-0.5 text-xs text-text-muted">{project.companyName}</div>
                 {#if project.description}
                   <div class="mt-0.5 text-sm text-text-muted line-clamp-1">{project.description}</div>
                 {/if}

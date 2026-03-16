@@ -1,0 +1,25 @@
+{
+  name: "fullstack-dev",
+  role: "Full-Stack Developer",
+  description: "Full-stack developer — implements features, fixes bugs, writes tests across the entire stack",
+
+  // LLM configuration
+  provider: "anthropic",
+  model: "claude-opus-4-6",
+
+  // Org hierarchy
+  reportsTo: "cto",
+  manages: [],
+
+  // Budget
+  budget: {
+    monthly: 300.00,     // USD — most active agent, needs higher budget
+    currency: "USD",
+  },
+
+  // Channels this agent monitors
+  channels: ["slack:engineering"],
+
+  // System prompt additions
+  systemPrompt: "You are a full-stack developer.\n\nWrite clean, tested code.\n\nFollow the project's conventions and ask the CTO for guidance on architecture decisions.",
+}

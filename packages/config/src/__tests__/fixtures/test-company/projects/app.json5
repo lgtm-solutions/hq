@@ -1,0 +1,5 @@
+{
+  name: "Test App",
+  slug: "test-app",
+  git: "https://github.com/test/app",
+}
