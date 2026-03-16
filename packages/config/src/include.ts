@@ -3,6 +3,18 @@ import { resolve, dirname } from 'node:path';
 import JSON5 from 'json5';
 
 /**
+ * Replace ${VAR_NAME} patterns in a string with environment variable values.
+ * Supports full replacement (entire string is one var) and inline interpolation.
+ */
+function resolveEnvVars(value: string): string {
+  return value.replace(/\$\{([^}]+)\}/g, (match, varName) => {
+    const envValue = process.env[varName];
+    if (envValue !== undefined) return envValue;
+    return match; // leave unresolved if env var not set
+  });
+}
+
+/**
  * Check if a string contains glob characters.
  */
 function isGlob(pattern: string): boolean {
@@ -70,6 +82,10 @@ export async function resolveIncludes(
   baseDir?: string,
 ): Promise<unknown> {
   const effectiveBase = baseDir ?? configRoot;
+
+  if (typeof obj === 'string') {
+    return resolveEnvVars(obj);
+  }
 
   if (obj === null || typeof obj !== 'object') {
     return obj;

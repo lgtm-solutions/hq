@@ -1,4 +1,4 @@
-import { getSecrets } from '$lib/server/config';
+import { getSecrets, getConfig } from '$lib/server/config';
 import { db } from '$lib/server/db';
 import { sql } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
@@ -18,6 +18,12 @@ interface Integration {
 
 export const load: PageServerLoad = async () => {
   const secrets = await getSecrets();
+  const config = await getConfig();
+
+  // Collect all slack tokens from company integrations
+  const hasSlackToken = config.companies.some(
+    (c) => hasValidKey(c.integrations?.slack?.slackBotToken)
+  );
 
   // Check database connection
   let dbStatus: IntegrationStatus = 'not_configured';
@@ -60,8 +66,8 @@ export const load: PageServerLoad = async () => {
       name: 'Slack',
       description: 'Team messaging and agent notifications',
       category: 'communication',
-      status: hasValidKey(secrets?.integrations?.slack?.botToken) ? 'connected' : 'not_configured',
-      statusMessage: hasValidKey(secrets?.integrations?.slack?.botToken) ? 'Bot token configured' : 'Not configured',
+      status: hasSlackToken ? 'connected' : 'not_configured',
+      statusMessage: hasSlackToken ? 'Bot token configured' : 'Not configured',
       icon: 'S',
       soon: true,
     },

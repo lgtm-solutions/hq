@@ -18,6 +18,8 @@ export interface IntegrationsConfig {
 }
 
 export interface SlackIntegrationConfig {
+  slackAppToken?: string;
+  slackBotToken?: string;
   workspace?: string;
   defaultChannel?: string;
   channels?: string[];

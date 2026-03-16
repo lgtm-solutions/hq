@@ -4,6 +4,8 @@ import { getConfig, getConfigDir, reloadConfig } from '../config.js';
 import { createAgent, updateAgent, deleteAgent } from '@hq/config';
 
 const slackSchema = z.object({
+  slackAppToken: z.string().optional().describe('Slack app token (xapp-...)'),
+  slackBotToken: z.string().optional().describe('Slack bot token (xoxb-...)'),
   workspace: z.string().optional().describe('Slack workspace name'),
   defaultChannel: z.string().optional().describe('Default channel'),
   channels: z.array(z.string()).optional().describe('Channels list'),
