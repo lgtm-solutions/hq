@@ -9,8 +9,9 @@ export {
 export type {
   HQConfig,
   CompanyConfig,
+  IntegrationsConfig,
+  SlackIntegrationConfig,
   AgentConfig,
   ProjectConfig,
   SecretsConfig,
-  BudgetConfig,
 } from './types.js';

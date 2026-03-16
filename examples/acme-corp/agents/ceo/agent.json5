@@ -11,14 +11,13 @@
   reportsTo: null,       // top of the chain
   manages: ["cto"],
 
-  // Budget
-  budget: {
-    monthly: 100.00,     // USD
-    currency: "USD",
+  // Integrations — overrides company-level defaults
+  integrations: {
+    slack: {
+      channels: ["general", "leadership"],
+      defaultChannel: "leadership",
+    },
   },
-
-  // Channels this agent monitors
-  channels: ["slack:general", "slack:leadership"],
 
   // System prompt — plain strings + $include globs get concatenated
   systemPrompt: [

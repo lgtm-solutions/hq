@@ -11,14 +11,12 @@
   reportsTo: "cto",
   manages: [],
 
-  // Budget
-  budget: {
-    monthly: 300.00,     // USD — most active agent, needs higher budget
-    currency: "USD",
+  // Integrations — overrides company-level defaults
+  integrations: {
+    slack: {
+      channels: ["engineering"],
+    },
   },
-
-  // Channels this agent monitors
-  channels: ["slack:engineering"],
 
   // System prompt — plain strings + $include globs get concatenated
   systemPrompt: [

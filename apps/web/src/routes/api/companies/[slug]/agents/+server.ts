@@ -31,8 +31,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     model,
     reportsTo: body.reportsTo ?? null,
     manages: body.manages || [],
-    budget: body.budget,
-    channels: body.channels,
+    integrations: body.integrations,
     systemPrompt: body.systemPrompt,
   });
 

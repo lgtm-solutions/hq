@@ -3,9 +3,14 @@ import { z } from 'zod';
 import { getConfig, getConfigDir, reloadConfig } from '../config.js';
 import { createAgent, updateAgent, deleteAgent } from '@hq/config';
 
-const budgetSchema = z.object({
-  monthly: z.number().describe('Monthly budget amount'),
-  currency: z.string().describe('Currency code (e.g. USD)'),
+const slackSchema = z.object({
+  workspace: z.string().optional().describe('Slack workspace name'),
+  defaultChannel: z.string().optional().describe('Default channel'),
+  channels: z.array(z.string()).optional().describe('Channels list'),
+}).optional();
+
+const integrationsSchema = z.object({
+  slack: slackSchema.describe('Slack integration config'),
 }).optional();
 
 export function registerAgentTools(server: McpServer) {
@@ -70,11 +75,10 @@ export function registerAgentTools(server: McpServer) {
       model: z.string().describe('Model ID (e.g. claude-sonnet-4-6)'),
       reportsTo: z.string().nullable().optional().describe('Name of the agent this one reports to'),
       manages: z.array(z.string()).optional().describe('Names of agents this one manages'),
-      budget: budgetSchema.describe('Budget config'),
-      channels: z.array(z.string()).optional().describe('Channels this agent monitors'),
+      integrations: integrationsSchema.describe('Integrations config — overrides company defaults'),
       systemPrompt: z.string().optional().describe('System prompt for the agent'),
     },
-    async ({ companySlug, name, role, description, provider, model, reportsTo, manages, budget, channels, systemPrompt }) => {
+    async ({ companySlug, name, role, description, provider, model, reportsTo, manages, integrations, systemPrompt }) => {
       const config = await getConfig();
       const company = config.companies.find((c) => c.slug === companySlug);
       if (!company) {
@@ -92,8 +96,7 @@ export function registerAgentTools(server: McpServer) {
         model,
         reportsTo: reportsTo ?? null,
         manages: manages || [],
-        budget,
-        channels,
+        integrations,
         systemPrompt,
       });
       await reloadConfig();
@@ -114,8 +117,7 @@ export function registerAgentTools(server: McpServer) {
       model: z.string().optional().describe('New model'),
       reportsTo: z.string().nullable().optional().describe('New reportsTo'),
       manages: z.array(z.string()).optional().describe('New manages list'),
-      budget: budgetSchema.describe('New budget'),
-      channels: z.array(z.string()).optional().describe('New channels'),
+      integrations: integrationsSchema.describe('Integrations config — overrides company defaults'),
       systemPrompt: z.string().optional().describe('New system prompt'),
     },
     async ({ companySlug, agentName, ...data }) => {

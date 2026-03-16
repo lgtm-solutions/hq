@@ -7,8 +7,20 @@ export interface CompanyConfig {
   slug: string;
   description?: string;
   mission?: string;
+  integrations?: IntegrationsConfig;
   agents: AgentConfig[];
   projects: ProjectConfig[];
+}
+
+export interface IntegrationsConfig {
+  slack?: SlackIntegrationConfig;
+  // Future: discord, telegram, etc.
+}
+
+export interface SlackIntegrationConfig {
+  workspace?: string;
+  defaultChannel?: string;
+  channels?: string[];
 }
 
 export interface AgentConfig {
@@ -19,8 +31,7 @@ export interface AgentConfig {
   model: string;
   reportsTo: string | null;
   manages: string[];
-  budget?: BudgetConfig;
-  channels?: string[];
+  integrations?: IntegrationsConfig;
   systemPrompt?: string | (string | { $include: string })[];
 }
 
@@ -38,9 +49,4 @@ export interface SecretsConfig {
   providers: Record<string, { apiKey: string }>;
   database: { url: string };
   integrations?: Record<string, Record<string, string>>;
-}
-
-export interface BudgetConfig {
-  monthly: number;
-  currency: string;
 }

@@ -11,14 +11,13 @@
   reportsTo: "ceo",
   manages: ["fullstack-dev"],
 
-  // Budget
-  budget: {
-    monthly: 200.00,     // USD — higher budget for code-heavy tasks
-    currency: "USD",
+  // Integrations — overrides company-level defaults
+  integrations: {
+    slack: {
+      channels: ["engineering", "leadership"],
+      defaultChannel: "engineering",
+    },
   },
-
-  // Channels this agent monitors
-  channels: ["slack:engineering", "slack:leadership"],
 
   // System prompt — plain strings + $include globs get concatenated
   systemPrompt: [

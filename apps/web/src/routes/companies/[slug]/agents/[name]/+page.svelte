@@ -48,14 +48,6 @@
         <div class="text-xs font-medium uppercase tracking-wider text-text-muted">Model</div>
         <div class="mt-1 text-sm font-mono">{data.agent.model}</div>
       </div>
-      {#if data.agent.budget}
-        <div>
-          <div class="text-xs font-medium uppercase tracking-wider text-text-muted">Budget</div>
-          <div class="mt-1 text-sm">
-            {data.agent.budget.monthly} {data.agent.budget.currency}/month
-          </div>
-        </div>
-      {/if}
       <div>
         <div class="text-xs font-medium uppercase tracking-wider text-text-muted">Reports To</div>
         <div class="mt-1 text-sm">{data.agent.reportsTo || 'Nobody'}</div>
@@ -73,12 +65,12 @@
       </div>
     {/if}
 
-    {#if data.agent.channels && data.agent.channels.length > 0}
+    {#if data.agent.integrations?.slack}
       <div>
-        <div class="text-xs font-medium uppercase tracking-wider text-text-muted">Channels</div>
+        <div class="text-xs font-medium uppercase tracking-wider text-text-muted">Slack</div>
         <div class="mt-1.5 flex flex-wrap gap-1.5">
-          {#each data.agent.channels as channel}
-            <span class="rounded bg-surface-3 px-2 py-0.5 text-xs font-mono text-text-secondary">{channel}</span>
+          {#each data.agent.integrations.slack.channels ?? [] as channel}
+            <span class="rounded bg-surface-3 px-2 py-0.5 text-xs font-mono text-text-secondary">#{channel}</span>
           {/each}
         </div>
       </div>
