@@ -20,6 +20,9 @@
   // Channels this agent monitors
   channels: ["slack:general", "slack:leadership"],
 
-  // System prompt additions
-  systemPrompt: "You are the CEO of Acme Corp. Focus on strategic decisions, company direction, and high-level prioritization.",
+  // System prompt — plain strings + $include globs get concatenated
+  systemPrompt: [
+    "You are the CEO of Acme Corp. Focus on strategic decisions, company direction, and high-level prioritization.",
+    { $include: "acme-corp/agents/ceo/*.md" },
+  ],
 }

@@ -88,15 +88,18 @@ export async function createAgent(
   companySlug: string,
   data: AgentConfig
 ): Promise<void> {
-  // Write agent file
-  const agentPath = resolve(configDir, companySlug, 'agents', `${data.name}.json5`);
+  // Create agent directory and write agent.json5
+  const agentDir = resolve(configDir, companySlug, 'agents', data.name);
+  await mkdir(agentDir, { recursive: true });
+
+  const agentPath = resolve(agentDir, 'agent.json5');
   const { ...agentData } = data;
   await writeJson5(agentPath, agentData);
 
   // Add $include to company.json5
   const companyPath = resolve(configDir, companySlug, 'company.json5');
   const company = await readJson5(companyPath);
-  company.agents.push({ $include: `${companySlug}/agents/${data.name}.json5` });
+  company.agents.push({ $include: `${companySlug}/agents/${data.name}/agent.json5` });
   await writeJson5(companyPath, company);
 }
 
@@ -106,7 +109,7 @@ export async function updateAgent(
   agentName: string,
   data: Partial<AgentConfig>
 ): Promise<void> {
-  const agentPath = resolve(configDir, companySlug, 'agents', `${agentName}.json5`);
+  const agentPath = resolve(configDir, companySlug, 'agents', agentName, 'agent.json5');
   const agent = await readJson5(agentPath);
 
   for (const [key, value] of Object.entries(data)) {
@@ -121,15 +124,15 @@ export async function deleteAgent(
   companySlug: string,
   agentName: string
 ): Promise<void> {
-  // Remove agent file
-  const agentPath = resolve(configDir, companySlug, 'agents', `${agentName}.json5`);
-  await rm(agentPath, { force: true });
+  // Remove agent directory
+  const agentDir = resolve(configDir, companySlug, 'agents', agentName);
+  await rm(agentDir, { recursive: true, force: true });
 
   // Remove $include from company.json5
   const companyPath = resolve(configDir, companySlug, 'company.json5');
   const company = await readJson5(companyPath);
   company.agents = company.agents.filter(
-    (entry: any) => !entry.$include?.endsWith(`/${agentName}.json5`)
+    (entry: any) => !entry.$include?.includes(`/agents/${agentName}/`)
   );
   await writeJson5(companyPath, company);
 }

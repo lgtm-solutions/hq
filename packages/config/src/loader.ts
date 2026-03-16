@@ -6,6 +6,24 @@ import { validateConfig } from './validate.js';
 import type { HQConfig, SecretsConfig } from './types.js';
 
 /**
+ * After $include resolution, systemPrompt may be an array of strings.
+ * Flatten it into a single string joined by double newlines.
+ */
+function flattenSystemPrompts(config: HQConfig): void {
+  for (const company of config.companies) {
+    for (const agent of company.agents) {
+      if (Array.isArray(agent.systemPrompt)) {
+        // Flatten nested arrays (from glob expansion) and join
+        const parts = (agent.systemPrompt as unknown[]).flat(Infinity).filter(
+          (p): p is string => typeof p === 'string' && p.length > 0
+        );
+        agent.systemPrompt = parts.join('\n\n');
+      }
+    }
+  }
+}
+
+/**
  * Load and validate the HQ config from a directory.
  * Reads companies.json5, resolves all $include directives, and validates the result.
  */
@@ -15,8 +33,9 @@ export async function loadConfig(configDir: string): Promise<HQConfig> {
 
   const raw = await readFile(companiesPath, 'utf-8');
   const parsed = JSON5.parse(raw);
-  const resolved = await resolveIncludes(parsed, configRoot);
+  const resolved = await resolveIncludes(parsed, configRoot) as HQConfig;
 
+  flattenSystemPrompts(resolved);
   validateConfig(resolved);
   return resolved;
 }

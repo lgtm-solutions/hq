@@ -21,7 +21,7 @@ export interface AgentConfig {
   manages: string[];
   budget?: BudgetConfig;
   channels?: string[];
-  systemPrompt?: string;
+  systemPrompt?: string | (string | { $include: string })[];
 }
 
 export interface ProjectConfig {

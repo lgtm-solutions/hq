@@ -6,9 +6,9 @@
 
   // Agents belonging to this company — each $include loads a full agent definition
   agents: [
-    { $include: "acme-corp/agents/ceo.json5" },
-    { $include: "acme-corp/agents/cto.json5" },
-    { $include: "agents/fullstack-dev.json5" },
+    { $include: "acme-corp/agents/ceo/agent.json5" },
+    { $include: "acme-corp/agents/cto/agent.json5" },
+    { $include: "agents/fullstack-dev/agent.json5" },
   ],
 
   // Projects managed by this company

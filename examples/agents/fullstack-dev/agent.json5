@@ -20,6 +20,9 @@
   // Channels this agent monitors
   channels: ["slack:engineering"],
 
-  // System prompt additions
-  systemPrompt: "You are a full-stack developer.\n\nWrite clean, tested code.\n\nFollow the project's conventions and ask the CTO for guidance on architecture decisions.",
+  // System prompt — plain strings + $include globs get concatenated
+  systemPrompt: [
+    "You are a full-stack developer. Write clean, tested code. Follow the project's conventions and ask the CTO for guidance on architecture decisions.",
+    { $include: "agents/fullstack-dev/*.md" },
+  ],
 }
