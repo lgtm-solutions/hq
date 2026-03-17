@@ -14,8 +14,6 @@
   // Integrations — overrides company-level defaults
   integrations: {
     slack: {
-      slackAppToken: "${SLACK_CEO_APP_TOKEN}",
-      slackBotToken: "${SLACK_CEO_BOT_TOKEN}",
       channels: ["general", "leadership"],
       defaultChannel: "leadership",
     },

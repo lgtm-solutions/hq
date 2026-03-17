@@ -1,7 +1,7 @@
 import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import JSON5 from 'json5';
-import type { AgentConfig, ProjectConfig } from './types.js';
+import type { AgentConfig, ProjectConfig, RawSecretsConfig } from './types.js';
 
 /**
  * Serialize an object to pretty JSON5 (unquoted keys, trailing commas).
@@ -187,4 +187,56 @@ export async function deleteProject(
     (entry: any) => !entry.$include?.endsWith(`/${projectSlug}.json5`)
   );
   await writeJson5(companyPath, company);
+}
+
+// ─── Secrets ───
+
+/**
+ * Write the entire secrets map to secrets.json5.
+ * Accepts raw config (may contain ConfigValue objects).
+ */
+export async function writeSecrets(
+  configDir: string,
+  secrets: RawSecretsConfig
+): Promise<void> {
+  const secretsPath = resolve(configDir, 'secrets.json5');
+  await writeJson5(secretsPath, secrets);
+}
+
+/**
+ * Update specific keys in secrets.json5 (shallow merge).
+ * New values are plain strings; existing ConfigValue objects are preserved.
+ */
+export async function updateSecrets(
+  configDir: string,
+  updates: Record<string, string>
+): Promise<void> {
+  const secretsPath = resolve(configDir, 'secrets.json5');
+  let existing: RawSecretsConfig = {};
+  try {
+    existing = await readJson5(secretsPath);
+  } catch {
+    // file doesn't exist yet — start fresh
+  }
+  await writeJson5(secretsPath, { ...existing, ...updates });
+}
+
+/**
+ * Delete specific keys from secrets.json5.
+ */
+export async function deleteSecrets(
+  configDir: string,
+  keys: string[]
+): Promise<void> {
+  const secretsPath = resolve(configDir, 'secrets.json5');
+  let existing: RawSecretsConfig;
+  try {
+    existing = await readJson5(secretsPath);
+  } catch {
+    return; // nothing to delete
+  }
+  for (const key of keys) {
+    delete existing[key];
+  }
+  await writeJson5(secretsPath, existing);
 }

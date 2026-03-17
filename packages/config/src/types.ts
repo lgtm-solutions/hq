@@ -47,8 +47,28 @@ export interface ProjectConfig {
   metadata?: Record<string, unknown>;
 }
 
-export interface SecretsConfig {
-  providers: Record<string, { apiKey: string }>;
-  database: { url: string };
-  integrations?: Record<string, Record<string, string>>;
-}
+/**
+ * A config value can be a plain string or an object describing how to load it.
+ *
+ * Examples:
+ *   "sk-ant-abc123"                                              — plain value
+ *   { type: "env", key: "DATABASE_URL" }                         — read from environment variable
+ *   { type: "file", path: "./secrets.json", key: "database_url"} — read a key from a JSON/JSON5 file
+ *   { type: "file", path: "/run/secrets/db" }                    — read entire file as value
+ */
+export type ConfigValue =
+  | string
+  | { type: 'env'; key: string }
+  | { type: 'file'; path: string; key?: string };
+
+/**
+ * Secrets are a flat key-value map. Each value is either a plain string
+ * or a ConfigValue describing how to load it. After resolution, all
+ * values become plain strings.
+ */
+export type SecretsConfig = Record<string, string>;
+
+/**
+ * Raw secrets before resolution — values can be ConfigValue objects.
+ */
+export type RawSecretsConfig = Record<string, ConfigValue>;

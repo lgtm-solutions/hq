@@ -7,8 +7,6 @@
   // Company-wide integrations — agents can override per-integration settings
   integrations: {
     slack: {
-      slackAppToken: "xapp-...",
-      slackBotToken: "xoxb-...",
       workspace: "acme-corp",
       defaultChannel: "general",
       channels: ["general", "engineering", "leadership"],

@@ -3,14 +3,15 @@ import { resolve, dirname } from 'node:path';
 import JSON5 from 'json5';
 
 /**
- * Replace ${VAR_NAME} patterns in a string with environment variable values.
- * Supports full replacement (entire string is one var) and inline interpolation.
+ * Replace ${VAR_NAME} patterns in a string with values from secrets map
+ * first, then environment variables. Unresolved placeholders are left as-is.
  */
-function resolveEnvVars(value: string): string {
+function resolveEnvVars(value: string, secrets?: Record<string, string>): string {
   return value.replace(/\$\{([^}]+)\}/g, (match, varName) => {
+    if (secrets && varName in secrets) return secrets[varName];
     const envValue = process.env[varName];
     if (envValue !== undefined) return envValue;
-    return match; // leave unresolved if env var not set
+    return match; // leave unresolved if not set
   });
 }
 
@@ -80,11 +81,12 @@ export async function resolveIncludes(
   configRoot: string,
   visited: Set<string> = new Set(),
   baseDir?: string,
+  secrets?: Record<string, string>,
 ): Promise<unknown> {
   const effectiveBase = baseDir ?? configRoot;
 
   if (typeof obj === 'string') {
-    return resolveEnvVars(obj);
+    return resolveEnvVars(obj, secrets);
   }
 
   if (obj === null || typeof obj !== 'object') {
@@ -94,7 +96,7 @@ export async function resolveIncludes(
   if (Array.isArray(obj)) {
     const results: unknown[] = [];
     for (const item of obj) {
-      const resolved = await resolveIncludes(item, configRoot, visited, effectiveBase);
+      const resolved = await resolveIncludes(item, configRoot, visited, effectiveBase, secrets);
       // If an $include glob expanded to an array, flatten it into the parent array
       if (Array.isArray(resolved) && isIncludeGlob(item)) {
         results.push(...resolved);
@@ -124,7 +126,7 @@ export async function resolveIncludes(
           const parsed = JSON5.parse(content);
           const newVisited = new Set(visited);
           newVisited.add(absPath);
-          results.push(await resolveIncludes(parsed, configRoot, newVisited, dirname(absPath)));
+          results.push(await resolveIncludes(parsed, configRoot, newVisited, dirname(absPath), secrets));
         } else {
           results.push(content.trim());
         }
@@ -151,13 +153,13 @@ export async function resolveIncludes(
     const newVisited = new Set(visited);
     newVisited.add(includePath);
 
-    return resolveIncludes(parsed, configRoot, newVisited, dirname(includePath));
+    return resolveIncludes(parsed, configRoot, newVisited, dirname(includePath), secrets);
   }
 
   // Recurse into all values
   const result: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(record)) {
-    result[key] = await resolveIncludes(value, configRoot, visited, effectiveBase);
+    result[key] = await resolveIncludes(value, configRoot, visited, effectiveBase, secrets);
   }
   return result;
 }

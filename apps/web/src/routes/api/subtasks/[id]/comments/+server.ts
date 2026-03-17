@@ -1,5 +1,5 @@
-import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
+import { json } from '@sveltejs/kit';
 import { comments, subtasks } from '@hq/db/schema';
 import { eq, asc } from 'drizzle-orm';
 import type { RequestHandler } from './$types';

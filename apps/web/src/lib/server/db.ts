@@ -1,25 +1,26 @@
-import { createDb, type Db } from '@hq/db';
-import { env } from '$env/dynamic/private';
+import { Database, type Db } from '@hq/db';
 
-let _db: Db;
-let _dbPromise: Promise<Db> | null = null;
+const DATABASE_URL = import.meta.env.VITE_DATABASE_URL;
 
-export async function getDb(): Promise<Db> {
-  if (_db) return _db;
-  if (!_dbPromise) {
-    if (!env.DATABASE_URL) {
+let _database: Database | null = null;
+
+export function getDatabase(): Database {
+  if (!_database) {
+    if (!DATABASE_URL) {
       throw new Error('DATABASE_URL is not set');
     }
-    _dbPromise = createDb(env.DATABASE_URL);
-    _db = await _dbPromise;
+    _database = new Database(DATABASE_URL);
   }
-  return _dbPromise;
+  return _database;
 }
 
-// Backward-compatible sync proxy — only works after first getDb() resolves
+/**
+ * Lazy proxy to the Drizzle ORM instance.
+ * Only works after getDatabase().connect() has been called (done in hooks.server.ts).
+ * Allows `import { db } from '$lib/server/db'` without top-level side effects.
+ */
 export const db = new Proxy({} as Db, {
   get(_, prop) {
-    if (!_db) throw new Error('Database not initialized yet. Use getDb() first.');
-    return (_db as any)[prop];
+    return (getDatabase().db as any)[prop];
   },
 });

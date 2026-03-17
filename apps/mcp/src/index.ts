@@ -1,7 +1,7 @@
 import { createServer } from 'node:http';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { getDb } from './db.js';
+import { getDatabase } from './db.js';
 import { getConfig } from './config.js';
 import { registerTaskTools } from './tools/tasks.js';
 import { registerSubtaskTools } from './tools/subtasks.js';
@@ -14,7 +14,7 @@ const PORT = parseInt(process.env.MCP_PORT || '3001', 10);
 
 async function main() {
   // Initialize DB (triggers auto-migration) and config
-  await getDb();
+  await getDatabase().connect();
   await getConfig();
   console.log('[hq-mcp] DB and config initialized');
 

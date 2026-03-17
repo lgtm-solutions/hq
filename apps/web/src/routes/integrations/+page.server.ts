@@ -1,6 +1,5 @@
-import { getSecrets, getConfig } from '$lib/server/config';
-import { db } from '$lib/server/db';
-import { sql } from 'drizzle-orm';
+import { getSecrets } from '$lib/server/config';
+import { getDatabase } from '$lib/server/db';
 import type { PageServerLoad } from './$types';
 
 type IntegrationStatus = 'connected' | 'not_configured' | 'error';
@@ -18,24 +17,39 @@ interface Integration {
 
 export const load: PageServerLoad = async () => {
   const secrets = await getSecrets();
-  const config = await getConfig();
 
-  // Collect all slack tokens from company integrations
-  const hasSlackToken = config.companies.some(
-    (c) => hasValidKey(c.integrations?.slack?.slackBotToken)
-  );
+  // Check if any agent has a valid slack bot token in secrets
+  const hasSlackToken = secrets
+    ? Object.keys(secrets).some(
+        (key) => key.startsWith('SLACK_') && key.endsWith('_BOT_TOKEN') && hasValidKey(secrets[key])
+      )
+    : false;
 
-  // Check database connection
+  // Probe database connection
   let dbStatus: IntegrationStatus = 'not_configured';
   let dbMessage = 'Not configured';
   try {
-    await db.execute(sql`SELECT 1`);
-    dbStatus = 'connected';
-    dbMessage = 'Connected';
-  } catch {
-    dbStatus = 'error';
-    dbMessage = 'Connection failed';
+    const database = getDatabase();
+    const result = await database.testConnection();
+    if (result.ok) {
+      dbStatus = 'connected';
+      dbMessage = 'Connected';
+    } else {
+      dbStatus = 'error';
+      dbMessage = result.error;
+    }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes('DATABASE_URL')) {
+      dbStatus = 'not_configured';
+      dbMessage = 'DATABASE_URL not set';
+    } else {
+      dbStatus = 'error';
+      dbMessage = msg;
+    }
   }
+
+  const s = (key: string) => secrets?.[key];
 
   const integrations: Integration[] = [
     // LLM Providers
@@ -44,8 +58,8 @@ export const load: PageServerLoad = async () => {
       name: 'Anthropic',
       description: 'Claude models for AI agent reasoning',
       category: 'provider',
-      status: hasValidKey(secrets?.providers?.anthropic?.apiKey) ? 'connected' : 'not_configured',
-      statusMessage: hasValidKey(secrets?.providers?.anthropic?.apiKey) ? 'API key configured' : 'No API key',
+      status: hasValidKey(s('ANTHROPIC_API_KEY')) ? 'connected' : 'not_configured',
+      statusMessage: hasValidKey(s('ANTHROPIC_API_KEY')) ? 'API key configured' : 'No API key',
       icon: 'A',
       soon: true,
     },
@@ -54,8 +68,8 @@ export const load: PageServerLoad = async () => {
       name: 'OpenAI',
       description: 'GPT models for AI agent reasoning',
       category: 'provider',
-      status: hasValidKey(secrets?.providers?.openai?.apiKey) ? 'connected' : 'not_configured',
-      statusMessage: hasValidKey(secrets?.providers?.openai?.apiKey) ? 'API key configured' : 'No API key',
+      status: hasValidKey(s('OPENAI_API_KEY')) ? 'connected' : 'not_configured',
+      statusMessage: hasValidKey(s('OPENAI_API_KEY')) ? 'API key configured' : 'No API key',
       icon: 'O',
       soon: true,
     },
@@ -69,15 +83,14 @@ export const load: PageServerLoad = async () => {
       status: hasSlackToken ? 'connected' : 'not_configured',
       statusMessage: hasSlackToken ? 'Bot token configured' : 'Not configured',
       icon: 'S',
-      soon: true,
     },
     {
       id: 'discord',
       name: 'Discord',
       description: 'Community messaging and agent notifications',
       category: 'communication',
-      status: hasValidKey(secrets?.integrations?.discord?.botToken) ? 'connected' : 'not_configured',
-      statusMessage: hasValidKey(secrets?.integrations?.discord?.botToken) ? 'Bot token configured' : 'Not configured',
+      status: hasValidKey(s('DISCORD_BOT_TOKEN')) ? 'connected' : 'not_configured',
+      statusMessage: hasValidKey(s('DISCORD_BOT_TOKEN')) ? 'Bot token configured' : 'Not configured',
       icon: 'D',
       soon: true,
     },
@@ -88,8 +101,8 @@ export const load: PageServerLoad = async () => {
       name: 'OpenClaw',
       description: 'Open-source agent runtime for autonomous execution',
       category: 'runtime',
-      status: hasValidKey(secrets?.integrations?.openclaw?.apiKey) ? 'connected' : 'not_configured',
-      statusMessage: hasValidKey(secrets?.integrations?.openclaw?.apiKey) ? 'Connected' : 'Not configured',
+      status: hasValidKey(s('OPENCLAW_API_KEY')) ? 'connected' : 'not_configured',
+      statusMessage: hasValidKey(s('OPENCLAW_API_KEY')) ? 'Connected' : 'Not configured',
       icon: 'C',
       soon: true,
     },
@@ -98,8 +111,8 @@ export const load: PageServerLoad = async () => {
       name: 'Claude Code',
       description: 'Anthropic CLI agent for coding tasks',
       category: 'runtime',
-      status: hasValidKey(secrets?.providers?.anthropic?.apiKey) ? 'connected' : 'not_configured',
-      statusMessage: hasValidKey(secrets?.providers?.anthropic?.apiKey) ? 'Available via Anthropic key' : 'Requires Anthropic API key',
+      status: hasValidKey(s('ANTHROPIC_API_KEY')) ? 'connected' : 'not_configured',
+      statusMessage: hasValidKey(s('ANTHROPIC_API_KEY')) ? 'Available via Anthropic key' : 'Requires Anthropic API key',
       icon: 'CC',
       soon: true,
     },
@@ -108,8 +121,8 @@ export const load: PageServerLoad = async () => {
       name: 'Codex',
       description: 'OpenAI agent for coding tasks',
       category: 'runtime',
-      status: hasValidKey(secrets?.providers?.openai?.apiKey) ? 'connected' : 'not_configured',
-      statusMessage: hasValidKey(secrets?.providers?.openai?.apiKey) ? 'Available via OpenAI key' : 'Requires OpenAI API key',
+      status: hasValidKey(s('OPENAI_API_KEY')) ? 'connected' : 'not_configured',
+      statusMessage: hasValidKey(s('OPENAI_API_KEY')) ? 'Available via OpenAI key' : 'Requires OpenAI API key',
       icon: 'CX',
       soon: true,
     },
@@ -120,8 +133,8 @@ export const load: PageServerLoad = async () => {
       name: 'GitHub',
       description: 'Source code hosting and CI/CD',
       category: 'source_control',
-      status: hasValidKey(secrets?.integrations?.github?.token) ? 'connected' : 'not_configured',
-      statusMessage: hasValidKey(secrets?.integrations?.github?.token) ? 'Token configured' : 'Not configured',
+      status: hasValidKey(s('GITHUB_TOKEN')) ? 'connected' : 'not_configured',
+      statusMessage: hasValidKey(s('GITHUB_TOKEN')) ? 'Token configured' : 'Not configured',
       icon: 'GH',
       soon: true,
     },
@@ -130,8 +143,8 @@ export const load: PageServerLoad = async () => {
       name: 'GitLab',
       description: 'Source code hosting and CI/CD',
       category: 'source_control',
-      status: hasValidKey(secrets?.integrations?.gitlab?.token) ? 'connected' : 'not_configured',
-      statusMessage: hasValidKey(secrets?.integrations?.gitlab?.token) ? 'Token configured' : 'Not configured',
+      status: hasValidKey(s('GITLAB_TOKEN')) ? 'connected' : 'not_configured',
+      statusMessage: hasValidKey(s('GITLAB_TOKEN')) ? 'Token configured' : 'Not configured',
       icon: 'GL',
       soon: true,
     },

@@ -31,3 +31,8 @@ export async function getSecrets(): Promise<SecretsConfig | null> {
   }
   return _secrets;
 }
+
+export async function reloadSecrets(): Promise<SecretsConfig | null> {
+  _secrets = await loadSecrets(getConfigDir());
+  return _secrets;
+}
