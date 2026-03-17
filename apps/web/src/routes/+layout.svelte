@@ -167,6 +167,12 @@
           </h1>
         {:else if page.url.pathname === '/agents'}
           <h1 class="text-sm font-medium">Agents</h1>
+        {:else if page.url.pathname === '/integrations/slack'}
+          <h1 class="text-sm font-medium">
+            <a href="/integrations" class="text-text-muted hover:text-text-secondary">Integrations</a>
+            <span class="text-text-muted mx-1.5">/</span>
+            Slack
+          </h1>
         {:else if page.url.pathname === '/integrations'}
           <h1 class="text-sm font-medium">Integrations</h1>
         {:else if page.url.pathname === '/tasks'}
