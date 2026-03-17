@@ -15,8 +15,6 @@
   let appTokenInput = $state('');
   let botTokenInput = $state('');
 
-  // Delete confirmation
-  let confirmDeleteAgent = $state<string | null>(null);
 
   function agentKey(companySlug: string, agentName: string): string {
     return `${companySlug}/${agentName}`;
@@ -139,13 +137,6 @@
     await invalidateAll();
   }
 
-  async function deleteApp(companySlug: string, agentName: string) {
-    await fetch(`/api/integrations/slack/apps/${companySlug}/${agentName}`, {
-      method: 'DELETE',
-    });
-    confirmDeleteAgent = null;
-    await invalidateAll();
-  }
 </script>
 
 <div class="space-y-8">
@@ -285,7 +276,6 @@
         {#each data.agents as agent}
           {@const key = agentKey(agent.companySlug, agent.name)}
           {@const isTokenFormOpen = expandedTokenAgent === key}
-          {@const isConfirmingDelete = confirmDeleteAgent === key}
 
           <div class="rounded-xl border-2 {borderClass(agent.status)} bg-surface-1 p-5 transition-colors">
             <!-- Agent Header -->
@@ -387,30 +377,6 @@
                 </button>
               {/if}
 
-              {#if agent.status !== 'not_created'}
-                {#if isConfirmingDelete}
-                  <span class="text-xs text-text-muted">Are you sure?</span>
-                  <button
-                    onclick={() => deleteApp(agent.companySlug, agent.name)}
-                    class="rounded-lg bg-danger/20 px-3 py-2 text-xs font-medium text-danger hover:bg-danger/30 transition-colors"
-                  >
-                    Confirm Delete
-                  </button>
-                  <button
-                    onclick={() => (confirmDeleteAgent = null)}
-                    class="rounded-lg bg-surface-3 px-3 py-2 text-xs font-medium text-text-secondary hover:bg-surface-3/80 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                {:else}
-                  <button
-                    onclick={() => (confirmDeleteAgent = key)}
-                    class="rounded-lg bg-surface-3 px-3 py-2 text-xs font-medium text-danger/80 hover:bg-danger/10 hover:text-danger transition-colors"
-                  >
-                    Delete
-                  </button>
-                {/if}
-              {/if}
             </div>
 
             <!-- Inline Token Form -->
