@@ -10,6 +10,8 @@
       workspace: "acme-corp",
       defaultChannel: "general",
       channels: ["general", "engineering", "leadership"],
+
+      slack_config_token: {type: "env", key: "SLACK_CONFIG_TOKEN"}
     },
   },
 
